@@ -29,6 +29,7 @@ export class MessageData {
     chatMessage.conversationId = data.conversationId;
     chatMessage.created = new Date();
     chatMessage.deleted = false;
+    chatMessage.tags = [];
 
     createRichContent(data, chatMessage);
 
@@ -369,5 +370,22 @@ export class MessageData {
     }
 
     return chatMessageToObject(updatedResult);
+  }
+
+  async addTag(messageId: ObjectID, tag: string): Promise<ChatMessage> {
+    const query = { _id: messageId };
+    const updateDocument = {
+      $addToSet: { tags: tag },
+    };
+
+    const message = await this.chatMessageModel.findOneAndUpdate(
+      query,
+      updateDocument,
+      { new: true, returnOriginal: false },
+    );
+
+    if (!message) throw new Error('The message to add a tag to does not exist');
+
+    return chatMessageToObject(message);
   }
 }

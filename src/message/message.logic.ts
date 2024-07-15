@@ -278,7 +278,6 @@ export class MessageLogic implements IMessageLogic {
     return blockedUsers.map((user) => user.blockedUserId);
   }
 
-
   async getChatConversationMessages(
     getMessageDto: GetMessageDto,
     authenticatedUser: IAuthenticatedUser,
@@ -313,7 +312,6 @@ export class MessageLogic implements IMessageLogic {
       paginatedChatMessages,
       blockedUserIds,
     );
-  
 
     return paginatedChatMessages;
   }
@@ -673,6 +671,24 @@ export class MessageLogic implements IMessageLogic {
       authenticatedUser.userId,
       option,
     );
+  }
+
+  // adding tags to message logic
+
+  async addTagToMessage(
+    chatMessageId: ObjectID,
+    tag: string,
+    authenticatedUser: IAuthenticatedUser,
+  ): Promise<ChatMessage> {
+    await this.throwForbiddenErrorIfNotAuthorized(
+      authenticatedUser,
+      chatMessageId,
+      Action.readConversation,
+    );
+
+    const message = await this.messageData.addTag(chatMessageId, tag);
+
+    return message;
   }
 
   private validateOption(
